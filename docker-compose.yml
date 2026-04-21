@@ -1,0 +1,50 @@
+services:
+  frontend:
+    build: ./frontend
+    container_name: smart_frontend
+    ports:
+      - "8082:80"
+    depends_on:
+      - backend
+    networks:
+      - public_net
+
+  backend:
+    build: ./backend
+    container_name: smart_backend
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    networks:
+      - public_net
+      - internal_net
+
+  sensor-simulator:
+    build: ./sensor-simulator
+    container_name: smart_sensor_simulator
+    depends_on:
+      - backend
+    networks:
+      - internal_net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: smart_postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - internal_net
+
+volumes:
+  postgres_data:
+
+networks:
+  public_net:
+    driver: bridge
+
+  internal_net:
+    driver: bridge

@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS sensor_readings (
+    id SERIAL PRIMARY KEY,
+    temperature NUMERIC(5,2) NOT NULL,
+    humidity INTEGER NOT NULL,
+    motion BOOLEAN NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

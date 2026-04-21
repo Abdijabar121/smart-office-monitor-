@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Office Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #222;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .status {
+            color: green;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #222;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Office Monitor</h1>
+
+    <div class="card">
+        <h2>Systemstatus</h2>
+        <p>Status: <span id="status" class="status">Henter...</span></p>
+    </div>
+
+    <div class="card">
+        <h2>Seneste sensordata</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Temperatur</th>
+                    <th>Luftfugtighed</th>
+                    <th>Bevægelse</th>
+                </tr>
+            </thead>
+            <tbody id="readings">
+                <tr>
+                    <td colspan="3">Henter data...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadStatus() {
+            const response = await fetch("/api/status");
+            const data = await response.json();
+            document.getElementById("status").textContent = data.system;
+        }
+
+        async function loadReadings() {
+            const response = await fetch("/api/readings");
+            const data = await response.json();
+
+            const tbody = document.getElementById("readings");
+            tbody.innerHTML = "";
+
+            if (data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='3'>Ingen data endnu</td></tr>";
+                return;
+            }
+
+            data.slice().reverse().forEach(reading => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${reading.temperature} °C</td>
+                    <td>${reading.humidity} %</td>
+                    <td>${reading.motion ? "Ja" : "Nej"}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        loadStatus();
+        loadReadings();
+
+        setInterval(loadReadings, 5000);
+    </script>
+</body>
+</html>

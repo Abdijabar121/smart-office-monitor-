@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smart-frontend
+  template:
+    metadata:
+      labels:
+        app: smart-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: smart-office-monitor-frontend:latest
+          ports:
+            - containerPort: 80
